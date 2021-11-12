@@ -13,7 +13,7 @@ runs:
     - uses: ravsamhq/notify-slack-action@v1
       with:
         status: ${{ job.status }}
-        notification_title: '<{repo_url}|{repo}> {status_message} Deployment to *${{ inputs.cluster-name }}*'
+        notification_title: '<{repo_url}|{repo}> {status_message} deployment to *${{ inputs.cluster-name }}*'
         message_format: '{emoji} *${{ github.event.head_commit.message }}*'
         footer: '<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View {workflow} Run>'
       env:
