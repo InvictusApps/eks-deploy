@@ -49,8 +49,8 @@ runs:
         tags: |
           ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
           ${{ env.IMAGE }}:latest
-        cache-from: type=registry,ref=${{ env.IMAGE }}:buildcache
-        cache-to: type=registry,ref=${{ env.IMAGE }}:buildcache,mode=max
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: Setup yq
       shell: bash
