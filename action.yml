@@ -42,13 +42,13 @@ runs:
       uses: docker/build-push-action@v2
       env:
         IMAGE_TAG: ${{ github.sha }}
-        IMAGE: "${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr-repository }}"
+        IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr-repository }}
       with:
         context: .
         push: true
-        tags:
-          - "${{ env.IMAGE }}:${{ env.IMAGE_TAG }}"
-          - "${{ env.IMAGE }}:latest"
+        tags: |
+          ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
+          ${{ env.IMAGE }}:latest
         cache-from: type=registry,ref=${{ env.IMAGE }}:buildcache
         cache-to: type=registry,ref=${{ env.IMAGE }}:buildcache,mode=max
 
@@ -63,7 +63,7 @@ runs:
     - name: Update deployment image
       env:
         DEPLOYMENT_FOLDER: ${{ inputs.deployment-folder }}
-        SHA_IMAGE: "${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr-repository }}:${{ github.sha }}"
+        SHA_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr-repository }}:${{ github.sha }}
       shell: bash
       run: |
         yq e -i '(.spec.template.spec.containers[0].image) = strenv(SHA_IMAGE)' $DEPLOYMENT_FOLDER/deployment.yml
