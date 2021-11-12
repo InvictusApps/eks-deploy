@@ -20,9 +20,14 @@ inputs:
   cluster-name:
     description: "Name of the k8s cluster"
     required: true
+  slack-webhook:
+    description: "Slack webhook URL for notification of status"
+    required: true
 runs:
   using: "composite"
   steps:
+    - uses: actions/checkout@v2
+
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -76,3 +81,12 @@ runs:
         kubectl apply -f $DEPLOYMENT_FOLDER
         find $DEPLOYMENT_FOLDER/deployment*.yml -exec kubectl rollout status -f {} --timeout=2m \;
 
+    - uses: ravsamhq/notify-slack-action@v1
+      if: always()
+      with:
+        status: ${{ job.status }}
+        notification_title: '{workflow} {status_message} for *<{repo_url}|{repo}>*'
+        message_format: '{emoji} *${{ github.event.head_commit.message }}*'
+        footer: '<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Workflow Run>'
+      env:
+        SLACK_WEBHOOK_URL: ${{ inputs.slack-webhook }}
