@@ -66,7 +66,7 @@ runs:
         SHA_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr-repository }}:${{ github.sha }}
       shell: bash
       run: |
-        yq e -i '(.spec.template.spec.containers[0].image) = strenv(SHA_IMAGE)' $DEPLOYMENT_FOLDER/deployment.yml
+        find $DEPLOYMENT_FOLDER/deployment*.yml -exec yq e -i '(.spec.template.spec.containers[0].image) = strenv(SHA_IMAGE)' {} \;
 
     - name: Setup kubectl
       shell: bash
@@ -85,5 +85,5 @@ runs:
       run: |
         aws eks update-kubeconfig --name $CLUSTER
         kubectl apply -f $DEPLOYMENT_FOLDER
-        kubectl rollout status -f $DEPLOYMENT_FOLDER
+        find $DEPLOYMENT_FOLDER/deployment*.yml -exec kubectl rollout status -f {} \;
 
