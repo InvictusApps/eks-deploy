@@ -1,0 +1,20 @@
+name: "Slack Notifier for k8s Deploy"
+description: "Notifies deployment status in slack for a k8s deployment"
+inputs:
+  cluster-name:
+    description: "Name of the k8s cluster"
+    required: true
+  slack-webhook:
+    description: "Slack webhook URL for notification of status"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: ravsamhq/notify-slack-action@v1
+      with:
+        status: ${{ job.status }}
+        notification_title: '*<{repo_url}|{repo}>* {status_message} Deployment to ${{ inputs.cluster-name }}'
+        message_format: '{emoji} *${{ github.event.head_commit.message }}*'
+        footer: '<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View {workflow} Run>'
+      env:
+        SLACK_WEBHOOK_URL: ${{ inputs.slack-webhook }}
