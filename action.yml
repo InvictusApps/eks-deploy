@@ -22,9 +22,6 @@ inputs:
     required: true
 runs:
   using: "composite"
-  env:
-    IMAGE_TAG: ${{ github.sha }}
-    DEPLOYMENT_FOLDER: ${{ inputs.deployment-folder }}
   steps:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -44,6 +41,7 @@ runs:
     - name: Build, tag, and push image to ECR
       uses: docker/build-push-action@v2
       env:
+        IMAGE_TAG: ${{ github.sha }}
         IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr-repository }}
       with:
         context: .
@@ -64,7 +62,8 @@ runs:
 
     - name: Update deployment image
       env:
-        SHA_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr-repository }}:${{ env.IMAGE_TAG }}
+        DEPLOYMENT_FOLDER: ${{ inputs.deployment-folder }}
+        SHA_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr-repository }}:${{ github.sha }}
       shell: bash
       run: |
         yq e -i '(.spec.template.spec.containers[0].image) = strenv(SHA_IMAGE)' $DEPLOYMENT_FOLDER/deployment.yml
@@ -81,6 +80,7 @@ runs:
     - name: Deploy to EKS
       shell: bash
       env:
+        DEPLOYMENT_FOLDER: ${{ inputs.deployment-folder }}
         CLUSTER: ${{ inputs.cluster-name }}
       run: |
         aws eks update-kubeconfig --name $CLUSTER
