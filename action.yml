@@ -58,6 +58,7 @@ runs:
       uses: mikefarah/yq@v4.14.1
       env:
         DEPLOYMENT_FOLDER: ${{ inputs.deployment-folder }}
+        SHA_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr-repository }}:${{ github.sha }}
       with:
         cmd: find $DEPLOYMENT_FOLDER/deployment*.yml -exec yq e -i '(.spec.template.spec.containers[0].image) = strenv(SHA_IMAGE)' {} \;
 
