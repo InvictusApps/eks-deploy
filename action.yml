@@ -20,9 +20,6 @@ inputs:
   cluster-name:
     description: "Name of the k8s cluster"
     required: true
-  slack-webhook:
-    description: "Slack webhook URL for notification of status"
-    required: true
 runs:
   using: "composite"
   steps:
