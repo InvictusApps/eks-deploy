@@ -79,4 +79,4 @@ runs:
       run: |
         aws eks update-kubeconfig --name $CLUSTER
         kubectl apply -f $DEPLOYMENT_FOLDER
-        find $DEPLOYMENT_FOLDER/deployment*.yml -print0 | xargs -0 -n1 kubectl rollout status --timeout=30s -f
+        find $DEPLOYMENT_FOLDER/deployment*.yml -print0 | xargs -0 -n1 kubectl rollout status --timeout=2m -f
