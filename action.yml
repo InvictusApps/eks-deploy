@@ -10,6 +10,7 @@ inputs:
   helm-chart:
     description: "Location of the helm chart"
     required: true
+    default: ./deployment/helm
   helm-values:
     description: "Location of the helm values file"
     required: true
@@ -62,10 +63,12 @@ runs:
 
     - name: Deploy Chart
       env:
+        CLUSTER_NAME: ${{ inputs.cluster-name }}
         SERVICE_NAME: ${{ inputs.service-name }}
         HELM_CHART: ${{ inputs.helm-chart }}
         HELM_VALUES: ${{ inputs.helm-values }}
         SHA_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.service-name }}:${{ github.sha }}
       shell: bash
       run: |
+        aws eks update-kubeconfig --name $CLUSTER_NAME
         helm upgrade $SERVICE_NAME $HELM_CHART --install --atomic --create-namespace -f $HELM_VALUES --set image=$SHA_IMAGE
