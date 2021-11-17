@@ -1,6 +1,18 @@
 name: "EKS Deploy"
 description: "Deploys a dockerized application to a Kubernetes cluster"
 inputs:
+  service-name:
+    description: "Name of the deployed service. Also the name of the ECR repository"
+    required: true
+  cluster-name:
+    description: "Name of the k8s cluster"
+    required: true
+  helm-chart:
+    description: "Location of the helm chart"
+    required: true
+  helm-values:
+    description: "Location of the helm values file"
+    required: true
   aws-access-key-id:
     description: "AWS Access Key for deploying to cluster"
     required: true
@@ -11,18 +23,6 @@ inputs:
     description: "AWS Region for cluster"
     required: true
     default: us-east-1
-  service-name:
-    description: "Name of the deployed service. Also the name of the ECR repository"
-    required: true
-  helm-chart:
-    description: "Location of the helm chart"
-    required: true
-  helm-values:
-    description: "Location of the helm values file"
-    required: true
-  cluster-name:
-    description: "Name of the k8s cluster"
-    required: true
 runs:
   using: "composite"
   steps:
