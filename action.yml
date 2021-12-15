@@ -78,14 +78,3 @@ runs:
       run: |
         aws eks update-kubeconfig --name $CLUSTER_NAME
         helm upgrade $SERVICE_NAME $HELM_CHART --install --atomic --create-namespace -f $HELM_VALUES --set image=$SHA_IMAGE
-
-    - name: Commit Updated Chart Version
-      env:
-        HELM_CHART: ${{ inputs.helm-chart }}
-      shell: bash
-      run: |
-        git add $HELM_CHART/Chart.yaml
-        git config --global user.name 'Prepared Bot'
-        git config --global user.email 'contact@preparedapp.com'
-        git commit --amend --no-edit
-        git push
