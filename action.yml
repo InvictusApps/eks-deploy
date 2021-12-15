@@ -85,5 +85,7 @@ runs:
       shell: bash
       run: |
         git add $HELM_CHART/Chart.yaml
+        git config --global user.name 'Prepared Bot'
+        git config --global user.email 'contact@preparedapp.com'
         git commit --amend --no-edit
         git push
