@@ -59,14 +59,6 @@ runs:
     - name: Setup Helm
       uses: azure/setup-helm@v1
 
-    - name: Update Chart Version
-      env:
-        HELM_CHART: ${{ inputs.helm-chart }}
-      shell: bash
-      run: |
-        export VERSION=$(git describe --tags --exact-match HEAD || git rev-parse HEAD) 2> /dev/null
-        sed -i "s/^appVersion:.*$/appVersion: \"$VERSION\"/" $HELM_CHART/Chart.yaml
-
     - name: Deploy Chart
       env:
         CLUSTER_NAME: ${{ inputs.cluster-name }}
@@ -77,4 +69,6 @@ runs:
       shell: bash
       run: |
         aws eks update-kubeconfig --name $CLUSTER_NAME
-        helm upgrade $SERVICE_NAME $HELM_CHART --install --atomic --create-namespace -f $HELM_VALUES --set image=$SHA_IMAGE
+        export VERSION=$(git describe --tags --exact-match HEAD || git rev-parse HEAD) 2> /dev/null
+        sed -i "s/^appVersion:.*$/appVersion: \"$VERSION\"/" $HELM_CHART/Chart.yaml
+        helm upgrade $SERVICE_NAME $HELM_CHART --install --atomic --create-namespace -f $HELM_VALUES --set image=$SHA_IMAGE --set version=$VERSION
