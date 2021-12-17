@@ -52,6 +52,10 @@ runs:
     - name: Setup Helm
       uses: azure/setup-helm@v1
 
+    - name: Setup kubeconfig
+      shell: bash
+      run: aws eks update-kubeconfig --name ${{ inputs.cluster-name }}
+
     - name: Get deployed values
       id: deployed-values
       shell: bash
@@ -97,7 +101,6 @@ runs:
     - name: Deploy Chart
       if: steps.check.outputs.skip == 'false'
       env:
-        CLUSTER_NAME: ${{ inputs.cluster-name }}
         SERVICE_NAME: ${{ inputs.service-name }}
         HELM_CHART: ${{ inputs.helm-chart }}
         HELM_VALUES: ${{ inputs.helm-values }}
@@ -105,6 +108,5 @@ runs:
         VERSION: ${{ steps.current-ref.outputs.value }}
       shell: bash
       run: |
-        aws eks update-kubeconfig --name $CLUSTER_NAME
         sed -i "s/^appVersion:.*$/appVersion: \"$VERSION\"/" $HELM_CHART/Chart.yaml
         helm upgrade $SERVICE_NAME $HELM_CHART --install --atomic --create-namespace -f $HELM_VALUES --set image=$SHA_IMAGE --set version=$VERSION
