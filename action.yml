@@ -97,9 +97,9 @@ runs:
         HELM_CHART: ${{ inputs.helm-chart }}
         HELM_VALUES: ${{ inputs.helm-values }}
         SHA_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.service-name }}:${{ github.sha }}
+        VERSION: ${{ steps.current-ref.outputs.value }}
       shell: bash
       run: |
         aws eks update-kubeconfig --name $CLUSTER_NAME
-        export VERSION=$(git describe --tags --exact-match HEAD || git rev-parse HEAD) 2> /dev/null
         sed -i "s/^appVersion:.*$/appVersion: \"$VERSION\"/" $HELM_CHART/Chart.yaml
         helm upgrade $SERVICE_NAME $HELM_CHART --install --atomic --create-namespace -f $HELM_VALUES --set image=$SHA_IMAGE --set version=$VERSION
