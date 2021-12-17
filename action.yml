@@ -58,10 +58,9 @@ runs:
 
     - name: Get deployed values
       shell: bash
-      continue-on-error: true
       run: |
         touch helm-values.yml
-        helm get values ${{ inputs.service-name }} -o yaml >> helm-values.yml
+        helm get values ${{ inputs.service-name }} -o yaml >> helm-values.yml || true
 
     - name: Get deployed ref
       id: deployed-ref
