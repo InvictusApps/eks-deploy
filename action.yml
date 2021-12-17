@@ -58,17 +58,13 @@ runs:
 
     - name: Get deployed values
       shell: bash
-      run: |
-        export DEPLOYED_VALUES=$(helm get values ${{ inputs.service-name }} -o yaml)
-        echo "DEPLOYED_VALUES<<EOF" >> $GITHUB_ENV
-        echo "$DEPLOYED_VALUES" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
+      run: helm get values ${{ inputs.service-name }} -o yaml >> helm-values.yml
 
     - name: Get deployed ref
       id: deployed-ref
       uses: mikefarah/yq@master
       with:
-        cmd: echo "${{ env.DEPLOYED_VALUES }}" | yq e '.version' -
+        cmd: yq eval '.version' 'helm-values.yml'
 
     - name: Check version
       id: check
