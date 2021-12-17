@@ -57,15 +57,18 @@ runs:
       run: aws eks update-kubeconfig --name ${{ inputs.cluster-name }}
 
     - name: Get deployed values
-      id: deployed-values
       shell: bash
-      run: echo "::set-output name=result::$(helm get values ${{ inputs.service-name }} -o yaml)"
+      run: |
+        DEPLOYED_VALUES = helm get values ${{ inputs.service-name }} -o yaml
+        echo "DEPLOYED_VALUES<<EOF" >> $GITHUB_ENV
+        echo "$DEPLOYED_VALUES" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
 
     - name: Get deployed ref
       id: deployed-ref
       uses: mikefarah/yq@master
       with:
-        cmd: echo ${{ steps.deployed-values.outputs.result }} | yq e '.version' -
+        cmd: echo ${{ env.DEPLOYED_VALUES }} | yq e '.version' -
 
     - name: Check version
       id: check
