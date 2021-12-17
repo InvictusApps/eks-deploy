@@ -52,11 +52,16 @@ runs:
     - name: Setup Helm
       uses: azure/setup-helm@v1
 
+    - name: Get deployed values
+      id: deployed-values
+      shell: bash
+      run: echo "::set-output name=result::$(helm get values ${{ inputs.service-name }} -o yaml)
+
     - name: Get deployed ref
       id: deployed-ref
       uses: mikefarah/yq@master
       with:
-        cmd: helm get values ${{ inputs.service-name }} -o yaml | yq e '.version' -
+        cmd: echo ${{ steps.deployed-values.outputs.result }} | yq e '.version' -
 
     - name: Check version
       id: check
