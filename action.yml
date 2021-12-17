@@ -55,7 +55,7 @@ runs:
     - name: Get deployed values
       id: deployed-values
       shell: bash
-      run: echo "::set-output name=result::$(helm get values ${{ inputs.service-name }} -o yaml)
+      run: echo "::set-output name=result::$(helm get values ${{ inputs.service-name }} -o yaml)"
 
     - name: Get deployed ref
       id: deployed-ref
