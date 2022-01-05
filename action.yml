@@ -39,18 +39,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Existence of Build Script
-      id: build-script
-      shell: bash
-      run: |
-        [ -d "./github/build" ] && echo echo "::set-output name=exists::1" || echo "::set-output name=exists::0"
-
-    - name: Run Build Script
-      if: ${{ steps.build-script.outputs.exists }}
-      uses: ./.github/build
-      with:
-        env: ${{ inputs.env }}
-
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -89,6 +77,18 @@ runs:
       shell: bash
       run: |
         echo "::set-output name=skip::$([ ${{ steps.current-ref.outputs.value }} == ${{ steps.deployed-ref.outputs.result }} ] && echo 'true' || echo 'false')"
+
+    - name: Existence of Build Script
+      id: build-script
+      shell: bash
+      run: |
+        [ -d "./github/build" ] && echo echo "::set-output name=exists::1" || echo "::set-output name=exists::0"
+
+    - name: Run Build Script
+      if: ${{ steps.build-script.outputs.exists }} && steps.check.outputs.skip == 'false'
+      uses: ./.github/build
+      with:
+        env: ${{ inputs.env }}
 
     - name: Login to Amazon ECR
       if: steps.check.outputs.skip == 'false'
