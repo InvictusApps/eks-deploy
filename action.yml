@@ -28,6 +28,10 @@ inputs:
     description: "Version to be deployed. If currently deployed version matches, deployment is skipped"
     required: true
     default: ""
+  env:
+    description: "Environment to build for"
+    required: true
+    default: ""
 outputs:
   skipped:
     description: "Whether deployment was skipped"
@@ -35,6 +39,18 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Existence of Build Script
+      id: build-script
+      shell: bash
+      run: |
+        [ -d "./github/build" ] && echo echo "::set-output name=exists::1" || echo "::set-output name=exists::0"
+
+    - name: Run Build Script
+      if: ${{ steps.build-script.outputs.exists }}
+      uses: ./.github/build
+      with:
+        env: ${{ inputs.env }}
+
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -104,10 +120,9 @@ runs:
       env:
         SERVICE_NAME: ${{ inputs.service-name }}
         HELM_CHART: ${{ inputs.helm-chart }}
-        HELM_VALUES: ${{ inputs.helm-values }}
         SHA_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.service-name }}:${{ github.sha }}
         VERSION: ${{ steps.current-ref.outputs.value }}
       shell: bash
       run: |
         sed -i "s/^appVersion:.*$/appVersion: \"$VERSION\"/" $HELM_CHART/Chart.yaml
-        helm upgrade $SERVICE_NAME $HELM_CHART --install --atomic --create-namespace -f $HELM_VALUES --set image=$SHA_IMAGE --set version=$VERSION
+        helm upgrade $SERVICE_NAME $HELM_CHART --install --atomic --create-namespace -f ./deployment/values/${{ inputs.env }}.yml --set image=$SHA_IMAGE --set version=$VERSION
