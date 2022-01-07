@@ -32,6 +32,9 @@ inputs:
     description: "Environment to build for"
     required: true
     default: ""
+  slack-webhook:
+    description: "Slack webhook URL for notification of status"
+    required: true
 outputs:
   skipped:
     description: "Whether deployment was skipped"
@@ -51,7 +54,11 @@ runs:
       shell: bash
       run: |
         export REF=$(git describe --tags --exact-match HEAD || git rev-parse HEAD) 2> /dev/null
+        export HEAD=$(git rev-parse HEAD) 2> /dev/null
+        export MESSAGE=$(git show -s --format=%s) 2> /dev/null
         echo "::set-output name=value::$REF"
+        echo "::set-output name=head::$HEAD"
+        echo "::set-output name=message::$MESSAGE"
 
     - name: Setup Helm
       uses: azure/setup-helm@v1
@@ -126,3 +133,13 @@ runs:
       run: |
         sed -i "s/^appVersion:.*$/appVersion: \"$VERSION\"/" $HELM_CHART/Chart.yaml
         helm upgrade $SERVICE_NAME $HELM_CHART --install --atomic --create-namespace -f ./deployment/values/${{ inputs.env }}.yml --set image=$SHA_IMAGE --set version=$VERSION
+
+    - uses: ravsamhq/notify-slack-action@v1
+      if: ${{ always() && steps.check.outputs.skip == 'false' }}
+      with:
+        status: ${{ job.status }}
+        notification_title: '<${{ github.server_url }}/InvictusApps/${{ inputs.service-name }}|${{ inputs.service-name }}> {status_message} deployment to *${{ inputs.cluster-name }}*'
+        message_format: '{emoji} *${{ steps.current-ref.outputs.message }}*'
+        footer: '<${{ github.server_url }}/InvictusApps/${{ inputs.service-name }}/commit/${{ steps.current-ref.outputs.head }}|View Head Commit>  | <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View {workflow} Run>'
+      env:
+        SLACK_WEBHOOK_URL: ${{ inputs.slack-webhook }}
