@@ -92,8 +92,8 @@ runs:
         [ -d "./.github/build" ] && echo echo "::set-output name=exists::1" || echo "::set-output name=exists::0"
 
     - name: Run Build Script
-      if: steps.build-script.outputs.exists == '0' && steps.check.outputs.skip == 'false'
-      uses: ./.github/build
+      if: steps.build-script.outputs.exists == '1' && steps.check.outputs.skip == 'false'
+      uses: ./.github/buildsjdalfk
       with:
         env: ${{ inputs.env }}
 
@@ -137,7 +137,7 @@ runs:
         echo "::set-output name=success::1"
 
     - name: Determine Deployment Status
-      if: always()
+      if: always() && steps.check.outputs.skip == 'false'
       id: status
       shell: bash
       run: |
