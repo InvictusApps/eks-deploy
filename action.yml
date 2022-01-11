@@ -89,7 +89,7 @@ runs:
       id: build-script
       shell: bash
       run: |
-        [ -d "./.github/build" ] && echo echo "::set-output name=exists::1" || echo "::set-output name=exists::0"
+        [ -d "./.github/build" ] && echo "::set-output name=exists::1" || echo "::set-output name=exists::0"
 
     - name: Run Build Script
       if: steps.build-script.outputs.exists == '1' && steps.check.outputs.skip == 'false'
