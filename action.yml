@@ -93,7 +93,7 @@ runs:
 
     - name: Run Build Script
       if: steps.build-script.outputs.exists == '1' && steps.check.outputs.skip == 'false'
-      uses: ./.github/buildsjdalfk
+      uses: ./.github/build
       with:
         env: ${{ inputs.env }}
 
