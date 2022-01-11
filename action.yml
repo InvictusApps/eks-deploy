@@ -147,7 +147,7 @@ runs:
       uses: ravsamhq/notify-slack-action@v1
       if: always() && steps.check.outputs.skip == 'false'
       with:
-        status: ${{ steps.status.outputs.value }}
+        status: failure
         notification_title: '<${{ github.server_url }}/InvictusApps/${{ inputs.service-name }}|${{ inputs.service-name }}> {status_message} deployment to *${{ inputs.cluster-name }}*'
         message_format: '{emoji} *${{ steps.current-ref.outputs.message }}*'
         footer: '<${{ github.server_url }}/InvictusApps/${{ inputs.service-name }}/commit/${{ steps.current-ref.outputs.head }}|View Head Commit>  | <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View {workflow} Run>'
