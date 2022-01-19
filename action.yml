@@ -53,7 +53,8 @@ runs:
       id: current-ref
       shell: bash
       run: |
-        export REF=$(git describe --tags --exact-match HEAD || git rev-parse HEAD) 2> /dev/null
+        export INPUT_VERSION=${{ inputs.version }}
+        export REF=$([ -n "$INPUT_VERSION" ] && $INPUT_VERSION || git describe --tags --exact-match HEAD || git rev-parse HEAD) 2> /dev/null
         export HEAD=$(git rev-parse HEAD) 2> /dev/null
         export MESSAGE=$(git show -s --format=%s) 2> /dev/null
         echo "::set-output name=value::$REF"
