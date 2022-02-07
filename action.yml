@@ -120,8 +120,6 @@ runs:
         tags: |
           ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
           ${{ env.IMAGE }}:${{ inputs.cluster-name }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
 
     - name: Deploy Chart
       if: steps.check.outputs.skip == 'false'
