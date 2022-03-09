@@ -97,6 +97,7 @@ runs:
       uses: ./.github/build
       with:
         env: ${{ inputs.env }}
+        version: ${{ inputs.version }}
 
     - name: Login to Amazon ECR
       if: steps.check.outputs.skip == 'false'
