@@ -98,6 +98,7 @@ runs:
       with:
         env: ${{ inputs.env }}
         version: ${{ inputs.version }}
+        cluster: ${{ inputs.cluster-name }}
 
     - name: Login to Amazon ECR
       if: steps.check.outputs.skip == 'false'
