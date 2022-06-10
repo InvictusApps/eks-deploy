@@ -35,6 +35,9 @@ inputs:
   slack-webhook:
     description: "Slack webhook URL for notification of status"
     required: true
+  build-args:
+    description: "arguments to pass for container build"
+    required: false
 outputs:
   skipped:
     description: "Whether deployment was skipped"
@@ -124,6 +127,7 @@ runs:
           ${{ env.IMAGE }}:${{ inputs.cluster-name }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        build-args: ${{ input.build-args }}
 
     - name: Deploy Chart
       if: steps.check.outputs.skip == 'false'
