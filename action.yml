@@ -140,7 +140,7 @@ runs:
       shell: bash
       run: |
         sed -i "s/^appVersion:.*$/appVersion: \"$VERSION\"/" $HELM_CHART/Chart.yaml
-        helm upgrade $SERVICE_NAME $HELM_CHART --install --atomic --create-namespace -f ./deployment/values/${{ inputs.env }}.yml --set image=$SHA_IMAGE --set version=$VERSION
+        helm upgrade $SERVICE_NAME $HELM_CHART --install --atomic --create-namespace -f ./deployment/values/${{ inputs.env }}.yml --set image=$SHA_IMAGE --set version=$VERSION --debug
         echo "::set-output name=success::1"
 
     - name: Determine Deployment Status
